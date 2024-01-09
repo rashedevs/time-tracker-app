@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Dashboard from "../Dashboard/Dashboard";
 import * as Components from "./Components";
 import {
   getAuth,
@@ -6,10 +7,12 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { app } from "../../firebase.init";
+import { useNavigate } from "react-router-dom";
 
 const auth = getAuth(app);
 
 const Login = () => {
+  const navigate = useNavigate();
   const [signIn, setSignIn] = useState(true);
 
   const [email, setEmail] = useState("");
@@ -36,8 +39,11 @@ const Login = () => {
 
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, email, password)
-      .then((value) => {
-        alert("login success");
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log("User signed in:", user);
+        //will navigate to home page later
+        navigate("/Dashboard");
         // setSignIn(!signIn);
       })
       .catch((error) => {

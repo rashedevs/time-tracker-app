@@ -1,24 +1,19 @@
 import "./App.css";
 // import { getDatabase, ref, set } from "firebase/database";
 // import { app } from "./firebase.init";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Pages/Login/Login";
-// import { Button } from "./Pages/Login/Components";
+import Dashboard from "./Pages/Dashboard/Dashboard";
 
-// const db = getDatabase(app);
-function App() {
-  // const putData = () => {
-  //   set(ref(db, "users/rashed"), {
-  //     id: 1,
-  //     name: "Rashed",
-  //     age: 28,
-  //   });
-  // };
+const App = () => {
   return (
-    <div className="container">
-      {/* <Button onClick={putData}>Put Data</Button> */}
-      <Login></Login>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
