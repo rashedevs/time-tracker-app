@@ -1,6 +1,9 @@
 import React, { useRef, useState } from "react";
 import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Modal from "react-modal";
+import { IoPersonCircle } from "react-icons/io5";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 // Little helpers ...
 const url = (name, wrap = false) =>
@@ -25,12 +28,62 @@ const ProjectCard = ({ title, description, onCardClick }) => (
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
       cursor: "pointer",
     }}
-    onClick={onCardClick}
+    // onClick={onCardClick}
   >
     <h3>{title}</h3>
     <p>{description}</p>
+    <div>
+      <FaEdit
+        size="20px"
+        onClick={onCardClick}
+        color="#FFA41B"
+        style={{ margin: "10px" }}
+      />
+      <MdDelete size="22px" color="red" style={{ margin: "10px" }} />
+    </div>
   </div>
 );
+const headStyle = {
+  position: "sticky",
+  top: 0,
+  right: 0,
+  height: "7vh",
+  backgroundColor: "#365486",
+  color: "#fff",
+  padding: "5px 1.7rem",
+  overflow: "hidden",
+  transition: "all 0.5s linear",
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "end",
+  alignItems: "center",
+};
+
+const customStyles = {
+  content: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "space-around",
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+    borderRadius: "8px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+    padding: "10px",
+    maxWidth: "500px",
+    maxHeight: "350px",
+    width: "100%",
+    height: "100%",
+    textAlign: "center",
+  },
+  overlay: {
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+  },
+};
 
 const EditModal = ({ isOpen, onClose, onSave, project }) => {
   const [editedTitle, setEditedTitle] = useState(project?.title || "");
@@ -48,7 +101,7 @@ const EditModal = ({ isOpen, onClose, onSave, project }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onRequestClose={onClose}>
+    <Modal isOpen={isOpen} style={customStyles} onRequestClose={onClose}>
       <h2>Edit Project</h2>
       <label>Title:</label>
       <input
@@ -63,8 +116,19 @@ const EditModal = ({ isOpen, onClose, onSave, project }) => {
         onChange={(e) => setEditedDescription(e.target.value)}
         placeholder={project?.description}
       ></textarea>
-      <button onClick={handleSave}>Save</button>
-      <button onClick={onClose}>Close</button>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <button style={{ margin: "0 10px" }} onClick={handleSave}>
+          Save
+        </button>
+        <button onClick={onClose}>Close</button>
+      </div>
     </Modal>
   );
 };
@@ -108,6 +172,13 @@ export default function App() {
   };
   return (
     <div style={{ width: "100%", height: "100%", background: "#253237" }}>
+      <div style={headStyle}>
+        <h4 style={{ color: "#FFA41B" }}>User Name</h4>
+        <IoPersonCircle
+          size="2rem"
+          style={{ marginLeft: "10px", marginRight: "10px" }}
+        />
+      </div>
       <Parallax ref={parallax} pages={3}>
         <ParallaxLayer
           offset={2}
