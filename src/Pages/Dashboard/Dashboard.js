@@ -1,9 +1,14 @@
 import React from "react";
+import LiveCounters from "./LiveCounters/LiveCounters";
+import "./Dashboard.css";
+import SideBar from "./SideBar/SideBar";
 
 const Dashboard = () => {
   return (
-    <div>
-      <p>Dashboard</p>
+    <div className="container">
+      <SideBar />
+      <LiveCounters />
+      <SideBar />
     </div>
   );
 };

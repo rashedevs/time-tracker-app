@@ -1,0 +1,44 @@
+
+.live-counters-card {
+    width: 600px;
+    height: 300px;
+    perspective: 800px;
+    cursor: pointer;
+  }
+  
+  .live-counters-card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease-in-out;
+  }
+  
+  .live-counters-card:hover .live-counters-card-inner {
+    transform: rotateY(10deg);
+  }
+  
+  .live-counters-card-face {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+  
+
+  .live-counters-card-face {
+    transition: transform 0.5s ease-in-out;
+  }
+  
+  .live-counters-card-face.back {
+    transform: rotateY(180deg);
+  }
+  

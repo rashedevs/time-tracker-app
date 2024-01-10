@@ -1,0 +1,23 @@
+.sidebar {
+    width: 15%;
+    min-height: 100vh;
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar li {
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  
+  .sidebar li:hover {
+    color: #ff8c00; /* Change color on hover as an example */
+  }
+  
