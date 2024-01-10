@@ -4,6 +4,12 @@ import Modal from "react-modal";
 import { IoPersonCircle } from "react-icons/io5";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { FaPlus } from "react-icons/fa";
+import { FaRegPauseCircle } from "react-icons/fa";
+import { RxResume } from "react-icons/rx";
+import { FaRegStopCircle } from "react-icons/fa";
+import { MdNotStarted } from "react-icons/md";
+import { MdOutlineNotStarted } from "react-icons/md";
 
 // Little helpers ...
 const url = (name, wrap = false) =>
@@ -13,7 +19,69 @@ const url = (name, wrap = false) =>
     wrap ? ")" : ""
   }`;
 
-const ProjectCard = ({ title, description, onCardClick }) => (
+const Card = () => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "150px",
+      padding: "20px",
+      margin: "20px",
+      background: "#fff",
+      borderRadius: "10px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+      cursor: "pointer",
+    }}
+  >
+    <h5>New Project</h5>
+    <FaPlus size="22px" color="green" style={{ marginLeft: "10px" }} />
+  </div>
+);
+
+const TimerCard = ({ title, description }) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "350px",
+      padding: "20px",
+      margin: "20px",
+      background: "#fff",
+      borderRadius: "10px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+      cursor: "pointer",
+    }}
+  >
+    <h5>{title} Timer</h5>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <FaRegPauseCircle
+        size="22px"
+        color="yellow"
+        style={{ margin: "0 10px" }}
+      />
+      <RxResume size="22px" color="green" style={{ margin: "0 10px" }} />
+      <FaRegStopCircle size="22px" color="red" style={{ margin: "0 10px" }} />
+    </div>
+  </div>
+);
+const ProjectCard = ({
+  title,
+  description,
+  onCardClick,
+  onTimerClick,
+  timer,
+}) => (
   <div
     style={{
       display: "flex",
@@ -30,17 +98,64 @@ const ProjectCard = ({ title, description, onCardClick }) => (
     }}
     // onClick={onCardClick}
   >
-    <h3>{title}</h3>
-    <p>{description}</p>
-    <div>
-      <FaEdit
-        size="20px"
-        onClick={onCardClick}
-        color="#FFA41B"
-        style={{ margin: "10px" }}
-      />
-      <MdDelete size="22px" color="red" style={{ margin: "10px" }} />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-evely",
+      }}
+    >
+      <h3>{timer ? title : "Timer"}</h3>
+      {timer ? (
+        <MdOutlineNotStarted
+          size="35px"
+          color="green"
+          onClick={onTimerClick}
+          style={{ marginLeft: "40px" }}
+        />
+      ) : (
+        <FaRegStopCircle
+          size="35px"
+          color="red"
+          onClick={onTimerClick}
+          style={{ marginLeft: "40px" }}
+        />
+      )}
     </div>
+
+    {timer ? (
+      <>
+        <p>{description}</p>
+        <div>
+          <FaEdit
+            size="20px"
+            onClick={onCardClick}
+            color="#FFA41B"
+            style={{ margin: "10px" }}
+          />
+          <MdDelete size="22px" color="red" style={{ margin: "10px" }} />
+        </div>
+      </>
+    ) : (
+      <>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <FaRegPauseCircle
+            size="25px"
+            color="yellow"
+            style={{ margin: "10px" }}
+          />
+          <RxResume size="25px" color="green" style={{ margin: "10px" }} />
+        </div>
+      </>
+    )}
   </div>
 );
 const headStyle = {
@@ -152,6 +267,7 @@ export default function App() {
 
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [timer, setTimer] = useState(false);
 
   const openModal = (project) => {
     setSelectedProject(project);
@@ -310,25 +426,43 @@ export default function App() {
         >
           <div
             style={{
+              position: "absolute",
               display: "flex",
-              flexDirection: "row",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
+              top: "30px",
+              left: "15%",
             }}
           >
-            {/* <button onClick={() => alert("project 1 opened")}>
-              Project 1 +
-            </button>
-            <button onClick={() => alert("project 2 opened")}>
-              Project 2 +
-            </button> */}
-            {projects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                {...project}
-                onCardClick={() => openModal(project)}
-              />
-            ))}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Card />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {projects.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  {...project}
+                  onCardClick={() => openModal(project)}
+                  onTimerClick={() => setTimer(!timer)}
+                  timer={timer}
+                />
+              ))}
+            </div>
           </div>
           <img src={url("cloud")} style={{ width: "20%" }} alt="" />
         </ParallaxLayer>

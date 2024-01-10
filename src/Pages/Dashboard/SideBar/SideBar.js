@@ -7,14 +7,14 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { RiLogoutCircleRLine } from "react-icons/ri";
 
 const SideBar = () => {
-  const styles = {
-    display: "flex",
-    alignItem: "center",
-    justifyContent: "center",
-    padding: "5px",
-    height: "20px",
-    // backgroundColor: "blue",
-  };
+  // const styles = {
+  //   display: "flex",
+  //   alignItem: "center",
+  //   justifyContent: "center",
+  //   padding: "5px",
+  //   height: "20px",
+  //   // backgroundColor: "blue",
+  // };
   return (
     <div className="sidebar">
       <div className="avatar"></div>
