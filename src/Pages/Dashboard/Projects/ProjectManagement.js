@@ -16,6 +16,8 @@ import { getAuth } from "firebase/auth";
 import { useTimer } from "react-timer-hook";
 import { getDatabase, ref, onValue, remove } from "firebase/database";
 import { app } from "../../../firebase.init";
+import Chart from "../Chart/Chart";
+import PieChart from "../Chart/PieChart";
 
 const auth = getAuth();
 
@@ -583,11 +585,13 @@ export default function ProjectManagement() {
         <ParallaxLayer
           offset={0}
           speed={0.1}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          style={
+            {
+              // display: "flex",
+              // alignItems: "center",
+              // justifyContent: "center",
+            }
+          }
         >
           <div
             style={{
@@ -597,7 +601,7 @@ export default function ProjectManagement() {
               alignItems: "center",
               justifyContent: "center",
               top: "30px",
-              left: "15%",
+              left: "25%",
             }}
           >
             <div
@@ -657,55 +661,89 @@ export default function ProjectManagement() {
           />
         </ParallaxLayer>
 
-        <ParallaxLayer
-          offset={1}
-          speed={0.1}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <ParallaxLayer offset={1} speed={0.1}>
           <div
             style={{
-              position: "absolute",
               display: "flex",
-              flexDirection: "column",
+              flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              top: "30px",
-              left: "15%",
+              background: "#F3F8FF",
+              left: "50%",
+              width: "80%",
+              height: "400px",
+              marginBottom: "20px",
+              marginLeft: "30px",
+              border: "1px solid #F3F8FF",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              borderRadius: "8px",
+              overflow: "hidden",
             }}
           >
-            <TimerCard />
+            {data ? (
+              <Chart projects={Object.entries(data)} />
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#ffffff",
+                  padding: "20px",
+                  margin: "20px",
+                  background: "#332941",
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <h4>No Bar Data Available!</h4>
+              </div>
+            )}
           </div>
-          {/* <button onClick={() => alert("Time Track")}>Time Track Graph</button> */}
           <img src={url("satellite")} style={{ width: "40%" }} alt="" />
         </ParallaxLayer>
 
-        <ParallaxLayer
-          offset={2}
-          speed={0}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <ParallaxLayer offset={2} speed={0}>
           <div
             style={{
-              position: "absolute",
               display: "flex",
-              flexDirection: "column",
+              flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              top: "30px",
-              left: "15%",
+              background: "#F3F8FF",
+              left: "50%",
+              width: "80%",
+              height: "400px",
+              marginBottom: "20px",
+              marginLeft: "30px",
+              border: "1px solid #F3F8FF",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              borderRadius: "8px",
+              overflow: "hidden",
             }}
           >
-            <TimerCard title={"Projects Graph"} />
+            {data ? (
+              <PieChart projects={Object.entries(data)} />
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#ffffff",
+                  padding: "20px",
+                  margin: "20px",
+                  background: "#332941",
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <h4>No Pie Data Available!</h4>
+              </div>
+            )}
           </div>
-          {/* <button onClick={() => alert("Time Track 2")}>Time Track 2</button> */}
           <img src={url("satellite2")} style={{ width: "40%" }} alt="" />
         </ParallaxLayer>
         <EditModal
