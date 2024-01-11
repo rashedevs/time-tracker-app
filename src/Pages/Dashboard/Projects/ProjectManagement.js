@@ -9,7 +9,9 @@ import { FaRegPauseCircle } from "react-icons/fa";
 import { RxResume } from "react-icons/rx";
 import { FaRegStopCircle } from "react-icons/fa";
 import { MdNotStarted } from "react-icons/md";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineNotStarted } from "react-icons/md";
+import Form from "../Form";
 
 // Little helpers ...
 const url = (name, wrap = false) =>
@@ -19,25 +21,33 @@ const url = (name, wrap = false) =>
     wrap ? ")" : ""
   }`;
 
-const Card = () => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "150px",
-      padding: "20px",
-      margin: "20px",
-      background: "#fff",
-      borderRadius: "10px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      cursor: "pointer",
-    }}
-  >
-    <h5>New Project</h5>
-    <FaPlus size="22px" color="green" style={{ marginLeft: "10px" }} />
-  </div>
+const Card = ({ openModal1, isModal1Open, closeModal1, modal1Content }) => (
+  <>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "150px",
+        padding: "20px",
+        margin: "20px",
+        background: "#fff",
+        borderRadius: "10px",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        cursor: "pointer",
+      }}
+    >
+      <h5>New Project</h5>
+      <FaPlus
+        onClick={openModal1}
+        size="22px"
+        color="green"
+        style={{ marginLeft: "10px" }}
+      />
+    </div>
+    {/* Modal */}
+  </>
 );
 
 const TimerCard = ({ title, description }) => (
@@ -200,6 +210,45 @@ const customStyles = {
   },
 };
 
+const ProjectModal = ({ isOpen, onClose }) => {
+  return (
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onClose}
+      style={{
+        content: {
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "space-around",
+          top: "50%",
+          left: "50%",
+          right: "auto",
+          bottom: "auto",
+          marginRight: "-50%",
+          transform: "translate(-50%, -50%)",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+          padding: "10px",
+          maxWidth: "600px",
+          maxHeight: "500px",
+          width: "100%",
+          height: "100%",
+          textAlign: "center",
+        },
+        overlay: {
+          backgroundColor: "rgba(0, 0, 0, 0.3)",
+        },
+      }}
+    >
+      <div style={{ marginLeft: "500px", marginTop: "20px" }}>
+        <IoIosCloseCircleOutline onClick={onClose} size="30px" color="red" />
+      </div>
+      <Form />
+      {/* <button onClick={onClose}>Close</button> */}
+    </Modal>
+  );
+};
 const EditModal = ({ isOpen, onClose, onSave, project }) => {
   const [editedTitle, setEditedTitle] = useState(project?.title || "");
   const [editedDescription, setEditedDescription] = useState(
@@ -264,6 +313,18 @@ export default function ProjectManagement() {
       user: "rasheduap2015@gmail.com",
     },
   ]);
+
+  const [isModal1Open, setModal1Open] = useState(false);
+  const [modal1Content, setModal1Content] = useState("");
+
+  const openModal1 = () => {
+    setModal1Content("This is a modal with simple text.");
+    setModal1Open(true);
+  };
+
+  const closeModal1 = () => {
+    setModal1Open(false);
+  };
 
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -443,7 +504,7 @@ export default function ProjectManagement() {
                 justifyContent: "center",
               }}
             >
-              <Card />
+              <Card openModal1={openModal1} />
             </div>
             <div
               style={{
@@ -527,6 +588,11 @@ export default function ProjectManagement() {
           onClose={closeModal}
           onSave={saveChanges}
           project={selectedProject}
+        />
+        <ProjectModal
+          isOpen={isModal1Open}
+          onClose={closeModal1}
+          modalContent={modal1Content}
         />
       </Parallax>
     </div>
