@@ -8,10 +8,12 @@ import { FaPlus } from "react-icons/fa";
 import { FaRegPauseCircle } from "react-icons/fa";
 import { RxResume } from "react-icons/rx";
 import { FaRegStopCircle } from "react-icons/fa";
-import { MdNotStarted } from "react-icons/md";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineNotStarted } from "react-icons/md";
 import Form from "../Form";
+import { getAuth } from "firebase/auth";
+
+const auth = getAuth();
 
 // Little helpers ...
 const url = (name, wrap = false) =>
@@ -245,7 +247,6 @@ const ProjectModal = ({ isOpen, onClose }) => {
         <IoIosCloseCircleOutline onClick={onClose} size="30px" color="red" />
       </div>
       <Form />
-      {/* <button onClick={onClose}>Close</button> */}
     </Modal>
   );
 };
@@ -339,7 +340,6 @@ export default function ProjectManagement() {
     setSelectedProject(null);
     setModalOpen(false);
   };
-
   const saveChanges = (updatedProject) => {
     setProjects((prevProjects) =>
       prevProjects.map((project) =>
@@ -350,7 +350,9 @@ export default function ProjectManagement() {
   return (
     <div style={{ width: "100%", height: "100%", background: "#253237" }}>
       <div style={headStyle}>
-        <h4 style={{ color: "#FFA41B" }}>User Name</h4>
+        <h4 style={{ color: "#FFA41B" }}>
+          {auth?.currentUser ? auth.currentUser?.email : "User"}
+        </h4>
         <IoPersonCircle
           size="2rem"
           style={{ marginLeft: "10px", marginRight: "10px" }}

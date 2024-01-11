@@ -10,9 +10,10 @@
   
   label {
     display: block;
-    margin-bottom: 0px;
-    font-size: medium;
+    margin-bottom: 5px;
+    font-size: small;
     font-weight: 600;
+    padding: 3px;
   }
   
   input,

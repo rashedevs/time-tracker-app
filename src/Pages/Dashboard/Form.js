@@ -89,14 +89,14 @@ const Form = () => {
           onChange={handleInputChange}
         />
       </label>
-      <label>
+      {/* <label>
         Time:
         <textarea
           name="time"
           value={formData.time}
           onChange={handleInputChange}
         />
-      </label>
+      </label> */}
 
       <label>
         Date:
