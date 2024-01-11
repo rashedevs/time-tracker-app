@@ -6,12 +6,14 @@ import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import { FaRegPauseCircle } from "react-icons/fa";
+import { IoChevronBackCircleOutline } from "react-icons/io5";
 import { RxResume } from "react-icons/rx";
 import { FaRegStopCircle } from "react-icons/fa";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineNotStarted } from "react-icons/md";
 import Form from "../Form";
 import { getAuth } from "firebase/auth";
+import { useTimer } from "react-timer-hook";
 
 const auth = getAuth();
 
@@ -51,6 +53,55 @@ const Card = ({ openModal1, isModal1Open, closeModal1, modal1Content }) => (
     {/* Modal */}
   </>
 );
+
+const Timer = ({ expiryTimestamp, onExpire, onTimerClick }) => {
+  const { hours, seconds, minutes, isRunning, start, pause, resume, restart } =
+    useTimer({
+      expiryTimestamp,
+      autoStart: true,
+      onExpire: () => {
+        onExpire();
+      },
+    });
+
+  return (
+    <div
+      className="clock"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "row",
+        }}
+      >
+        {/* <h3>{`${"H"} : ${"M"} : ${"S"} `}</h3>
+        <h3> {`    |    `} </h3> */}
+        <h2>{` ${hours} : ${minutes} : ${seconds}`}</h2>
+      </div>
+      <div>
+        {isRunning ? (
+          <FaRegPauseCircle size="30px" color="yellow" onClick={pause} />
+        ) : (
+          <MdOutlineNotStarted size="30px" color="green" onClick={resume} />
+        )}
+        <FaRegStopCircle
+          size="30px"
+          color="red"
+          onClick={onTimerClick}
+          style={{ marginLeft: "30px" }}
+        />
+      </div>
+    </div>
+  );
+};
 
 const TimerCard = ({ title, description }) => (
   <div
@@ -92,84 +143,101 @@ const ProjectCard = ({
   description,
   onCardClick,
   onTimerClick,
+  project,
   timer,
-}) => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "300px",
-      padding: "20px",
-      margin: "20px",
-      background: "#fff",
-      borderRadius: "10px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      cursor: "pointer",
-    }}
-    // onClick={onCardClick}
-  >
+  hours = 1,
+}) => {
+  const [timerExpiry, setTimerExpiry] = useState(
+    Date.now() + +hours * 60 * 60 * 1000
+  );
+
+  const handleTimerExpire = () => {
+    alert("Project Time expired!");
+  };
+
+  return (
     <div
       style={{
         display: "flex",
-        flexDirection: "row",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "space-evely",
+        justifyContent: "center",
+        width: "300px",
+        padding: "20px",
+        margin: "20px",
+        background: "#fff",
+        borderRadius: "10px",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        cursor: "pointer",
       }}
+      // onClick={onCardClick}
     >
-      <h3>{timer ? title : "Timer"}</h3>
-      {timer ? (
-        <MdOutlineNotStarted
-          size="35px"
-          color="green"
-          onClick={onTimerClick}
-          style={{ marginLeft: "40px" }}
-        />
-      ) : (
-        <FaRegStopCircle
-          size="35px"
-          color="red"
-          onClick={onTimerClick}
-          style={{ marginLeft: "40px" }}
-        />
-      )}
-    </div>
-
-    {timer ? (
-      <>
-        <p>{description}</p>
-        <div>
-          <FaEdit
-            size="20px"
-            onClick={onCardClick}
-            color="#FFA41B"
-            style={{ margin: "10px" }}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-evely",
+        }}
+      >
+        <h3>{timer ? title : "Timer Count"}</h3>
+        {timer ? (
+          <MdOutlineNotStarted
+            size="35px"
+            color="green"
+            onClick={onTimerClick}
+            style={{ marginLeft: "40px" }}
           />
-          <MdDelete size="22px" color="red" style={{ margin: "10px" }} />
-        </div>
-      </>
-    ) : (
-      <>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <FaRegPauseCircle
+        ) : (
+          <IoChevronBackCircleOutline
+            size="35px"
+            color="purple"
+            onClick={onTimerClick}
+            style={{ marginLeft: "40px" }}
+          />
+        )}
+      </div>
+
+      {timer ? (
+        <>
+          <p>{description}</p>
+          <div>
+            <FaEdit
+              size="20px"
+              onClick={onCardClick}
+              color="#FFA41B"
+              style={{ margin: "10px" }}
+            />
+            <MdDelete size="22px" color="red" style={{ margin: "10px" }} />
+          </div>
+        </>
+      ) : (
+        <>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {/* <FaRegPauseCircle
             size="25px"
             color="yellow"
             style={{ margin: "10px" }}
           />
-          <RxResume size="25px" color="green" style={{ margin: "10px" }} />
-        </div>
-      </>
-    )}
-  </div>
-);
+          <RxResume size="25px" color="green" style={{ margin: "10px" }} /> */}
+            <Timer
+              expiryTimestamp={timerExpiry}
+              onExpire={handleTimerExpire}
+              onTimerClick={onTimerClick}
+            />
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 const headStyle = {
   position: "sticky",
   top: 0,
