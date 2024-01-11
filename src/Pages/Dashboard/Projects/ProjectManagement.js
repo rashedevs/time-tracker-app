@@ -314,7 +314,7 @@ const ProjectModal = ({ isOpen, onClose }) => {
       <div style={{ marginLeft: "500px", marginTop: "20px" }}>
         <IoIosCloseCircleOutline onClick={onClose} size="30px" color="red" />
       </div>
-      <Form />
+      <Form onClose={onClose} />
     </Modal>
   );
 };
