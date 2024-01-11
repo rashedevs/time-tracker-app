@@ -33,14 +33,14 @@ const SideBar = () => {
             <span>Time Track</span>
           </a>
         </li>
-        <li>
+        {/* <li>
           <a href="#">
             <FaTasks
             // style={{ width: "15px", margin: "2px 5px 0 0" }}
             />
             <span>Task Notes</span>
           </a>
-        </li>
+        </li> */}
         <li>
           <a href="#">
             <IoSettingsOutline

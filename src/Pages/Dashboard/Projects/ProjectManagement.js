@@ -56,7 +56,7 @@ const TimerCard = ({ title, description }) => (
       cursor: "pointer",
     }}
   >
-    <h5>{title} Timer</h5>
+    <h5>{title ? title : "Timer Graph"}</h5>
     <div
       style={{
         display: "flex",
@@ -248,7 +248,7 @@ const EditModal = ({ isOpen, onClose, onSave, project }) => {
   );
 };
 
-export default function App() {
+export default function ProjectManagement() {
   const parallax = useRef(null);
   const [projects, setProjects] = useState([
     {
@@ -464,7 +464,11 @@ export default function App() {
               ))}
             </div>
           </div>
-          <img src={url("cloud")} style={{ width: "20%" }} alt="" />
+          <img
+            src={url("satellite3")}
+            style={{ width: "90%", color: "blue" }}
+            alt=""
+          />
         </ParallaxLayer>
 
         <ParallaxLayer
@@ -476,10 +480,21 @@ export default function App() {
             justifyContent: "center",
           }}
         >
-          <button onClick={() => alert("Open Card Details")}>
-            Card details
-          </button>
-          {/* <img src={url("")} style={{ width: "20%" }} alt="" /> */}
+          <div
+            style={{
+              position: "absolute",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              top: "30px",
+              left: "15%",
+            }}
+          >
+            <TimerCard />
+          </div>
+          {/* <button onClick={() => alert("Time Track")}>Time Track Graph</button> */}
+          <img src={url("satellite")} style={{ width: "40%" }} alt="" />
         </ParallaxLayer>
 
         <ParallaxLayer
@@ -491,7 +506,21 @@ export default function App() {
             justifyContent: "center",
           }}
         >
-          <button onClick={() => alert("Edit Card Details")}>Edit</button>
+          <div
+            style={{
+              position: "absolute",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              top: "30px",
+              left: "15%",
+            }}
+          >
+            <TimerCard title={"Projects Graph"} />
+          </div>
+          {/* <button onClick={() => alert("Time Track 2")}>Time Track 2</button> */}
+          <img src={url("satellite2")} style={{ width: "40%" }} alt="" />
         </ParallaxLayer>
         <EditModal
           isOpen={isModalOpen}
