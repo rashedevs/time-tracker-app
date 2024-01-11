@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Modal from "react-modal";
 import { IoPersonCircle } from "react-icons/io5";
@@ -14,6 +14,8 @@ import { MdOutlineNotStarted } from "react-icons/md";
 import Form from "../Form";
 import { getAuth } from "firebase/auth";
 import { useTimer } from "react-timer-hook";
+import { getDatabase, ref, onValue, remove } from "firebase/database";
+import { app } from "../../../firebase.init";
 
 const auth = getAuth();
 
@@ -140,12 +142,14 @@ const TimerCard = ({ title, description }) => (
 );
 const ProjectCard = ({
   title,
-  description,
+  id,
+  notes,
   onCardClick,
   onTimerClick,
   project,
   timer,
-  hours = 1,
+  hours,
+  deleteProject,
 }) => {
   const [timerExpiry, setTimerExpiry] = useState(
     Date.now() + +hours * 60 * 60 * 1000
@@ -180,7 +184,7 @@ const ProjectCard = ({
           justifyContent: "space-evely",
         }}
       >
-        <h3>{timer ? title : "Timer Count"}</h3>
+        <h3>{title}</h3>
         {timer ? (
           <MdOutlineNotStarted
             size="35px"
@@ -200,7 +204,7 @@ const ProjectCard = ({
 
       {timer ? (
         <>
-          <p>{description}</p>
+          <p>{notes}</p>
           <div>
             <FaEdit
               size="20px"
@@ -208,7 +212,12 @@ const ProjectCard = ({
               color="#FFA41B"
               style={{ margin: "10px" }}
             />
-            <MdDelete size="22px" color="red" style={{ margin: "10px" }} />
+            <MdDelete
+              onClick={() => deleteProject(id)}
+              size="22px"
+              color="red"
+              style={{ margin: "10px" }}
+            />
           </div>
         </>
       ) : (
@@ -221,12 +230,6 @@ const ProjectCard = ({
               justifyContent: "center",
             }}
           >
-            {/* <FaRegPauseCircle
-            size="25px"
-            color="yellow"
-            style={{ margin: "10px" }}
-          />
-          <RxResume size="25px" color="green" style={{ margin: "10px" }} /> */}
             <Timer
               expiryTimestamp={timerExpiry}
               onExpire={handleTimerExpire}
@@ -367,6 +370,37 @@ const EditModal = ({ isOpen, onClose, onSave, project }) => {
 };
 
 export default function ProjectManagement() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const database = getDatabase(app);
+    const dataRef = ref(database, "/projects"); // Replace '/your-data-path' with the actual path in your database
+
+    // Use the onValue function to listen for changes in the data
+    const unsubscribe = onValue(dataRef, (snapshot) => {
+      // The snapshot contains the data
+      const newData = snapshot.val();
+      setData(newData);
+    });
+
+    // Cleanup the subscription when the component unmounts
+    return () => unsubscribe();
+  }, []);
+
+  const deleteProject = (id) => {
+    const database = getDatabase(app);
+    const projectRef = ref(database, `projects/${id}`); // Assuming 'projects' is your data path
+
+    // Use the 'remove' function to delete the project
+    remove(projectRef)
+      .then(() => {
+        console.log("Project deleted successfully!");
+      })
+      .catch((error) => {
+        console.error("Error deleting project:", error);
+      });
+  };
+
   const parallax = useRef(null);
   const [projects, setProjects] = useState([
     {
@@ -584,15 +618,36 @@ export default function ProjectManagement() {
                 justifyContent: "center",
               }}
             >
-              {projects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  {...project}
-                  onCardClick={() => openModal(project)}
-                  onTimerClick={() => setTimer(!timer)}
-                  timer={timer}
-                />
-              ))}
+              {data ? (
+                Object.entries(data).map(([id, project]) => (
+                  <ProjectCard
+                    key={id}
+                    id={id}
+                    {...project}
+                    onCardClick={() => openModal(project)}
+                    onTimerClick={() => setTimer(!timer)}
+                    timer={timer}
+                    deleteProject={deleteProject}
+                  />
+                ))
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#ffffff",
+                    padding: "20px",
+                    margin: "20px",
+                    background: "#332941",
+                    borderRadius: "10px",
+                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  <h4>No Projects Available. Please create one!</h4>
+                </div>
+              )}
             </div>
           </div>
           <img
