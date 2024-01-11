@@ -5,25 +5,31 @@ import { IoMdTime } from "react-icons/io";
 import { FaTasks } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 import { RiLogoutCircleRLine } from "react-icons/ri";
+import { signOut } from "firebase/auth";
+import { getAuth } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const SideBar = () => {
-  // const styles = {
-  //   display: "flex",
-  //   alignItem: "center",
-  //   justifyContent: "center",
-  //   padding: "5px",
-  //   height: "20px",
-  //   // backgroundColor: "blue",
-  // };
+  const auth = getAuth();
+  const history = useNavigate();
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      await signOut(auth);
+      history("/");
+    } catch (error) {
+      console.error("Error logging out:", error.message);
+    }
+  };
+
   return (
     <div className="sidebar">
-      <div className="avatar"></div>
+      <div className="avatar" style={{ height: "50px" }}></div>
       <ul className="menu">
         <li className="active">
           <a href="#">
-            <MdDashboardCustomize
-            // style={{ height: "20px", margin: "2px 0 0 0" }}
-            />
+            <MdDashboardCustomize />
             <span style={{ margin: "0 5px" }}>Dashboard</span>
           </a>
         </li>
@@ -35,22 +41,18 @@ const SideBar = () => {
         </li>
         {/* <li>
           <a href="#">
-            <FaTasks
-            // style={{ width: "15px", margin: "2px 5px 0 0" }}
-            />
+            <FaTasks />
             <span>Task Notes</span>
           </a>
         </li> */}
         <li>
           <a href="#">
-            <IoSettingsOutline
-            // style={{ width: "15px", margin: "4px 5px 0 0" }}
-            />
+            <IoSettingsOutline />
             <span>Settings</span>
           </a>
         </li>
         <li>
-          <a href="#">
+          <a href="#" onClick={handleLogout}>
             <RiLogoutCircleRLine />
             <span>Logout</span>
           </a>
