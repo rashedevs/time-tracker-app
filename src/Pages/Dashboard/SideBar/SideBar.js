@@ -4,6 +4,7 @@ import { MdDashboardCustomize } from "react-icons/md";
 import { IoMdTime } from "react-icons/io";
 import { FaTasks } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
+import { FaChartLine } from "react-icons/fa";
 import { RiLogoutCircleRLine } from "react-icons/ri";
 import { signOut } from "firebase/auth";
 import { getAuth } from "firebase/auth";
@@ -35,8 +36,8 @@ const SideBar = () => {
         </li>
         <li>
           <a href="#">
-            <IoMdTime />
-            <span>Time Track</span>
+            <FaChartLine />
+            <span>Charts</span>
           </a>
         </li>
         {/* <li>
@@ -45,12 +46,12 @@ const SideBar = () => {
             <span>Task Notes</span>
           </a>
         </li> */}
-        <li>
+        {/* <li>
           <a href="#">
             <IoSettingsOutline />
             <span>Settings</span>
           </a>
-        </li>
+        </li> */}
         <li>
           <a href="#" onClick={handleLogout}>
             <RiLogoutCircleRLine />

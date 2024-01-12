@@ -6,7 +6,7 @@ import { getAuth } from "firebase/auth";
 
 const auth = getAuth();
 
-const Form = ({ onClose }) => {
+const Form = ({ onClose, project }) => {
   const [formData, setFormData] = useState({
     title: "",
     task: "",

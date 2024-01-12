@@ -12,6 +12,7 @@ import { FaRegStopCircle } from "react-icons/fa";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineNotStarted } from "react-icons/md";
 import Form from "../Form";
+import Field from "../Field";
 import { getAuth } from "firebase/auth";
 import { useTimer } from "react-timer-hook";
 import { getDatabase, ref, onValue, remove } from "firebase/database";
@@ -152,6 +153,8 @@ const ProjectCard = ({
   timer,
   hours,
   deleteProject,
+  openModal,
+  onEditClick,
 }) => {
   const [timerExpiry, setTimerExpiry] = useState(
     Date.now() + +hours * 60 * 60 * 1000
@@ -210,7 +213,7 @@ const ProjectCard = ({
           <div>
             <FaEdit
               size="20px"
-              onClick={onCardClick}
+              onClick={() => onEditClick(project)}
               color="#FFA41B"
               style={{ margin: "10px" }}
             />
@@ -323,50 +326,42 @@ const ProjectModal = ({ isOpen, onClose }) => {
     </Modal>
   );
 };
-const EditModal = ({ isOpen, onClose, onSave, project }) => {
-  const [editedTitle, setEditedTitle] = useState(project?.title || "");
-  const [editedDescription, setEditedDescription] = useState(
-    project?.description || ""
-  );
-
-  const handleSave = () => {
-    onSave({
-      ...project,
-      title: editedTitle,
-      description: editedDescription,
-    });
-    onClose();
-  };
-
+const NewModal = ({ isOpen, onClose, project, projectId }) => {
+  console.log("Project data in NewModal:", project);
   return (
-    <Modal isOpen={isOpen} style={customStyles} onRequestClose={onClose}>
-      <h2>Edit Project</h2>
-      <label>Title:</label>
-      <input
-        type="text"
-        value={editedTitle}
-        onChange={(e) => setEditedTitle(e.target.value)}
-        placeholder={project?.title}
-      />
-      <label>Description:</label>
-      <textarea
-        value={editedDescription}
-        onChange={(e) => setEditedDescription(e.target.value)}
-        placeholder={project?.description}
-      ></textarea>
-      <div
-        style={{
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onClose}
+      style={{
+        content: {
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <button style={{ margin: "0 10px" }} onClick={handleSave}>
-          Save
-        </button>
-        <button onClick={onClose}>Close</button>
+          justifyContent: "space-around",
+          top: "50%",
+          left: "50%",
+          right: "auto",
+          bottom: "auto",
+          marginRight: "-50%",
+          transform: "translate(-50%, -50%)",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+          padding: "10px",
+          maxWidth: "600px",
+          maxHeight: "500px",
+          width: "100%",
+          height: "100%",
+          textAlign: "center",
+        },
+        overlay: {
+          backgroundColor: "rgba(0, 0, 0, 0.3)",
+        },
+      }}
+    >
+      <div style={{ marginLeft: "500px", marginTop: "20px" }}>
+        <IoIosCloseCircleOutline onClick={onClose} size="30px" color="red" />
       </div>
+      <Field onClose={onClose} project={project} projectId={projectId} />
     </Modal>
   );
 };
@@ -404,21 +399,6 @@ export default function ProjectManagement() {
   };
 
   const parallax = useRef(null);
-  const [projects, setProjects] = useState([
-    {
-      id: 1,
-      title: "Project 1",
-      description: "Description for Project 1",
-      user: "rasheduap2015@gmail.com",
-    },
-    {
-      id: 2,
-      title: "Project 2",
-      description: "Description for Project 2",
-      user: "rasheduap2015@gmail.com",
-    },
-  ]);
-
   const [isModal1Open, setModal1Open] = useState(false);
   const [modal1Content, setModal1Content] = useState("");
 
@@ -431,26 +411,16 @@ export default function ProjectManagement() {
     setModal1Open(false);
   };
 
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleEditClick = (id, project) => {
+    setSelectedProject({ id, ...project });
+    setEditModalOpen(true);
+  };
+
   const [timer, setTimer] = useState(false);
 
-  const openModal = (project) => {
-    setSelectedProject(project);
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setSelectedProject(null);
-    setModalOpen(false);
-  };
-  const saveChanges = (updatedProject) => {
-    setProjects((prevProjects) =>
-      prevProjects.map((project) =>
-        project.id === updatedProject.id ? updatedProject : project
-      )
-    );
-  };
   return (
     <div style={{ width: "100%", height: "100%", background: "#253237" }}>
       <div style={headStyle}>
@@ -601,7 +571,7 @@ export default function ProjectManagement() {
               alignItems: "center",
               justifyContent: "center",
               top: "30px",
-              left: "25%",
+              left: "20%",
             }}
           >
             <div
@@ -628,10 +598,11 @@ export default function ProjectManagement() {
                     key={id}
                     id={id}
                     {...project}
-                    onCardClick={() => openModal(project)}
+                    // onCardClick={() => openModal(project)}
                     onTimerClick={() => setTimer(!timer)}
                     timer={timer}
                     deleteProject={deleteProject}
+                    onEditClick={() => handleEditClick(id, project)}
                   />
                 ))
               ) : (
@@ -746,16 +717,22 @@ export default function ProjectManagement() {
           </div>
           <img src={url("satellite2")} style={{ width: "40%" }} alt="" />
         </ParallaxLayer>
-        <EditModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onSave={saveChanges}
-          project={selectedProject}
-        />
+
         <ProjectModal
           isOpen={isModal1Open}
           onClose={closeModal1}
           modalContent={modal1Content}
+        />
+        {/* <NewModal
+          isOpen={isEditModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          project={selectedProject}
+        /> */}
+        <NewModal
+          isOpen={isEditModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          project={selectedProject}
+          projectId={selectedProject ? selectedProject.id : null}
         />
       </Parallax>
     </div>
