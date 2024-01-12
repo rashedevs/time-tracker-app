@@ -69,13 +69,14 @@ const Card = ({ openModal1, isModal1Open, closeModal1, modal1Content }) => (
 );
 
 const Timer = ({ expiryTimestamp, onExpire, onTimerClick }) => {
-  const { hours, seconds, minutes, isRunning, pause, resume } = useTimer({
-    expiryTimestamp,
-    autoStart: true,
-    onExpire: () => {
-      onExpire();
-    },
-  });
+  const { hours, seconds, minutes, isRunning, start, pause, resume, restart } =
+    useTimer({
+      expiryTimestamp,
+      autoStart: false,
+      onExpire: () => {
+        onExpire();
+      },
+    });
 
   return (
     <div
@@ -108,7 +109,7 @@ const Timer = ({ expiryTimestamp, onExpire, onTimerClick }) => {
         <FaRegStopCircle
           size="30px"
           color="red"
-          onClick={onTimerClick}
+          onClick={restart}
           style={{ marginLeft: "30px" }}
         />
       </div>
@@ -117,6 +118,7 @@ const Timer = ({ expiryTimestamp, onExpire, onTimerClick }) => {
 };
 
 const ProjectCard = ({
+  isRunning,
   title,
   id,
   notes,
@@ -129,12 +131,25 @@ const ProjectCard = ({
   openModal,
   onEditClick,
 }) => {
-  const [timerExpiry] = useState(Date.now() + +hours * 60 * 60 * 1000);
-
+  const [timerExpiry] = useState(Date.now() + hours * 60 * 60 * 1000);
+  const MAX_NOTE_LENGTH = 20;
+  const truncatedNotes =
+    notes.length > MAX_NOTE_LENGTH
+      ? `${notes.slice(0, MAX_NOTE_LENGTH)}...`
+      : notes;
   const handleTimerExpire = () => {
     alert("Project Time expired!");
   };
-
+  const [status, setStatus] = useState(false);
+  const handlClick = (id) => {
+    // onTimerClick(id);
+    if (status === true && isRunning) {
+      onTimerClick(id);
+      setStatus(!status);
+    } else {
+      setStatus(!status);
+    }
+  };
   return (
     <div
       style={{
@@ -161,26 +176,28 @@ const ProjectCard = ({
         }}
       >
         <h3>{title}</h3>
-        {timer ? (
+        {!status ? (
           <MdOutlineNotStarted
             size="35px"
             color="green"
-            onClick={onTimerClick}
+            // onClick={onTimerClick}
+            onClick={() => handlClick(id)}
             style={{ marginLeft: "40px" }}
           />
         ) : (
           <IoChevronBackCircleOutline
             size="35px"
             color="purple"
-            onClick={onTimerClick}
+            // onClick={onTimerClick}
+            onClick={() => handlClick(id)}
             style={{ marginLeft: "40px" }}
           />
         )}
       </div>
 
-      {timer ? (
+      {!isRunning && !status ? (
         <>
-          <p>{notes}</p>
+          <p>{truncatedNotes}</p>
           <div>
             <FaEdit
               size="20px"
@@ -210,6 +227,7 @@ const ProjectCard = ({
               expiryTimestamp={timerExpiry}
               onExpire={handleTimerExpire}
               onTimerClick={onTimerClick}
+              isRunning={isRunning}
             />
           </div>
         </>
@@ -232,32 +250,6 @@ const headStyle = {
   justifyContent: "end",
   alignItems: "center",
 };
-
-// const customStyles = {
-//   content: {
-//     display: "flex",
-//     flexDirection: "column",
-//     alignItems: "center",
-//     justifyContent: "space-around",
-//     top: "50%",
-//     left: "50%",
-//     right: "auto",
-//     bottom: "auto",
-//     marginRight: "-50%",
-//     transform: "translate(-50%, -50%)",
-//     borderRadius: "8px",
-//     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-//     padding: "10px",
-//     maxWidth: "500px",
-//     maxHeight: "350px",
-//     width: "100%",
-//     height: "100%",
-//     textAlign: "center",
-//   },
-//   overlay: {
-//     backgroundColor: "rgba(0, 0, 0, 0.3)",
-//   },
-// };
 
 const styles = {
   projects: {
@@ -440,6 +432,24 @@ export default function ProjectManagement() {
 
   const [timer, setTimer] = useState(false);
 
+  const [timerStates, setTimerStates] = useState({});
+
+  // ...
+
+  const handleTimerClick = (id) => {
+    setTimerStates((prevStates) => {
+      const isRunning = !prevStates[id] || !prevStates[id].isRunning;
+
+      // Assuming you have an object structure to track timer states
+      return {
+        ...prevStates,
+        [id]: {
+          isRunning,
+        },
+      };
+    });
+  };
+
   return (
     <div style={{ width: "100%", height: "100%", background: "#253237" }}>
       <div style={headStyle}>
@@ -614,10 +624,11 @@ export default function ProjectManagement() {
                       id={id}
                       {...project}
                       // onCardClick={() => openModal(project)}
-                      onTimerClick={() => setTimer(!timer)}
-                      timer={timer}
+                      onTimerClick={handleTimerClick}
+                      timer={timerStates[id]}
                       deleteProject={deleteProject}
                       onEditClick={() => handleEditClick(id, project)}
+                      isRunning={timerStates[id] && timerStates[id].isRunning}
                     />
                   ))
               ) : (
