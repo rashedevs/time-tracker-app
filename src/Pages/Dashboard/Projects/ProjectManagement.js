@@ -430,8 +430,6 @@ export default function ProjectManagement() {
     setEditModalOpen(true);
   };
 
-  const [timer, setTimer] = useState(false);
-
   const [timerStates, setTimerStates] = useState({});
 
   // ...
