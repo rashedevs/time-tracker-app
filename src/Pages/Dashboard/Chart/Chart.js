@@ -21,6 +21,10 @@ const Chart = ({ projects }) => {
     const yAxisData = projectHoursData.map((project) => project.totalHours);
 
     const options = {
+      title: {
+        text: "Hours Counts by Project",
+        left: "center",
+      },
       tooltip: {
         trigger: "axis",
         axisPointer: {

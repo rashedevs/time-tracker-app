@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { getDatabase, push, ref, update } from "firebase/database";
+import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { getDatabase, ref, update } from "firebase/database";
 import { app } from "../../firebase.init";
 import "./Form.css";
 import { getAuth } from "firebase/auth";
@@ -26,8 +28,6 @@ const Field = ({ onClose, project }) => {
 
   const handleSaveButtonClick = () => {
     const database = getDatabase(app);
-    const projectsRef = ref(database, "projects");
-
     const updatedProjectData = {
       title: formData.title,
       task: formData.task,
@@ -42,11 +42,25 @@ const Field = ({ onClose, project }) => {
       const projectRef = ref(database, `projects/${project.id}`);
       update(projectRef, updatedProjectData)
         .then(() => {
-          console.log("Project updated successfully!");
+          toast.success("Project updated successfully!", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
           onClose();
         })
         .catch((error) => {
-          console.error("Error updating project:", error);
+          toast.error("Error updating project", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
         });
     }
     // else {
@@ -134,6 +148,7 @@ const Field = ({ onClose, project }) => {
         />
       </label>
       {project && <button onClick={handleSaveButtonClick}>Save</button>}
+      <ToastContainer />
     </div>
   );
 };

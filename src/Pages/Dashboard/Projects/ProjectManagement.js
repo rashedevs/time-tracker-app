@@ -7,15 +7,24 @@ import { MdDelete } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import { FaRegPauseCircle } from "react-icons/fa";
 import { IoChevronBackCircleOutline } from "react-icons/io5";
-import { RxResume } from "react-icons/rx";
 import { FaRegStopCircle } from "react-icons/fa";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineNotStarted } from "react-icons/md";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Form from "../Form";
 import Field from "../Field";
 import { getAuth } from "firebase/auth";
 import { useTimer } from "react-timer-hook";
-import { getDatabase, ref, onValue, remove } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  remove,
+  orderByChild,
+  equalTo,
+  query,
+} from "firebase/database";
 import { app } from "../../../firebase.init";
 import Chart from "../Chart/Chart";
 import PieChart from "../Chart/PieChart";
@@ -60,14 +69,13 @@ const Card = ({ openModal1, isModal1Open, closeModal1, modal1Content }) => (
 );
 
 const Timer = ({ expiryTimestamp, onExpire, onTimerClick }) => {
-  const { hours, seconds, minutes, isRunning, start, pause, resume, restart } =
-    useTimer({
-      expiryTimestamp,
-      autoStart: true,
-      onExpire: () => {
-        onExpire();
-      },
-    });
+  const { hours, seconds, minutes, isRunning, pause, resume } = useTimer({
+    expiryTimestamp,
+    autoStart: true,
+    onExpire: () => {
+      onExpire();
+    },
+  });
 
   return (
     <div
@@ -108,41 +116,6 @@ const Timer = ({ expiryTimestamp, onExpire, onTimerClick }) => {
   );
 };
 
-const TimerCard = ({ title, description }) => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "350px",
-      padding: "20px",
-      margin: "20px",
-      background: "#fff",
-      borderRadius: "10px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      cursor: "pointer",
-    }}
-  >
-    <h5>{title ? title : "Timer Graph"}</h5>
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <FaRegPauseCircle
-        size="22px"
-        color="yellow"
-        style={{ margin: "0 10px" }}
-      />
-      <RxResume size="22px" color="green" style={{ margin: "0 10px" }} />
-      <FaRegStopCircle size="22px" color="red" style={{ margin: "0 10px" }} />
-    </div>
-  </div>
-);
 const ProjectCard = ({
   title,
   id,
@@ -156,9 +129,7 @@ const ProjectCard = ({
   openModal,
   onEditClick,
 }) => {
-  const [timerExpiry, setTimerExpiry] = useState(
-    Date.now() + +hours * 60 * 60 * 1000
-  );
+  const [timerExpiry] = useState(Date.now() + +hours * 60 * 60 * 1000);
 
   const handleTimerExpire = () => {
     alert("Project Time expired!");
@@ -171,7 +142,8 @@ const ProjectCard = ({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        width: "300px",
+        minWidth: "280px",
+        maxWidth: "300px",
         padding: "20px",
         margin: "20px",
         background: "#fff",
@@ -179,7 +151,6 @@ const ProjectCard = ({
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         cursor: "pointer",
       }}
-      // onClick={onCardClick}
     >
       <div
         style={{
@@ -262,32 +233,39 @@ const headStyle = {
   alignItems: "center",
 };
 
-const customStyles = {
-  content: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "space-around",
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    borderRadius: "8px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-    padding: "10px",
-    maxWidth: "500px",
-    maxHeight: "350px",
-    width: "100%",
-    height: "100%",
-    textAlign: "center",
-  },
-  overlay: {
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+// const customStyles = {
+//   content: {
+//     display: "flex",
+//     flexDirection: "column",
+//     alignItems: "center",
+//     justifyContent: "space-around",
+//     top: "50%",
+//     left: "50%",
+//     right: "auto",
+//     bottom: "auto",
+//     marginRight: "-50%",
+//     transform: "translate(-50%, -50%)",
+//     borderRadius: "8px",
+//     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+//     padding: "10px",
+//     maxWidth: "500px",
+//     maxHeight: "350px",
+//     width: "100%",
+//     height: "100%",
+//     textAlign: "center",
+//   },
+//   overlay: {
+//     backgroundColor: "rgba(0, 0, 0, 0.3)",
+//   },
+// };
+
+const styles = {
+  projects: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    gap: "20px",
   },
 };
-
 const ProjectModal = ({ isOpen, onClose }) => {
   return (
     <Modal
@@ -369,32 +347,73 @@ const NewModal = ({ isOpen, onClose, project, projectId }) => {
 export default function ProjectManagement() {
   const [data, setData] = useState(null);
 
+  // useEffect(() => {
+  //   const database = getDatabase(app);
+  //   const dataRef = ref(database, "/projects");
+
+  //   const unsubscribe = onValue(dataRef, (snapshot) => {
+  //     const newData = snapshot.val();
+  //     setData(newData);
+  //   });
+
+  //   return () => unsubscribe();
+  // }, []);
+
   useEffect(() => {
     const database = getDatabase(app);
-    const dataRef = ref(database, "/projects"); // Replace '/your-data-path' with the actual path in your database
+    const dataRef = ref(database, "/projects");
 
-    // Use the onValue function to listen for changes in the data
-    const unsubscribe = onValue(dataRef, (snapshot) => {
-      // The snapshot contains the data
-      const newData = snapshot.val();
-      setData(newData);
-    });
+    const userEmail = auth.currentUser ? auth.currentUser.email : null;
 
-    // Cleanup the subscription when the component unmounts
-    return () => unsubscribe();
-  }, []);
+    if (userEmail) {
+      // If user is logged in, filter projects by user's email
+      const userProjectsRef = query(
+        dataRef,
+        orderByChild("user"),
+        equalTo(userEmail)
+      );
+
+      const unsubscribe = onValue(userProjectsRef, (snapshot) => {
+        const newData = snapshot.val();
+        setData(newData);
+      });
+
+      return () => unsubscribe();
+    } else {
+      // If user is not logged in, fetch all projects
+      const unsubscribe = onValue(dataRef, (snapshot) => {
+        const newData = snapshot.val();
+        setData(newData);
+      });
+
+      return () => unsubscribe();
+    }
+  }, [auth?.currentUser]);
 
   const deleteProject = (id) => {
     const database = getDatabase(app);
-    const projectRef = ref(database, `projects/${id}`); // Assuming 'projects' is your data path
+    const projectRef = ref(database, `projects/${id}`);
 
-    // Use the 'remove' function to delete the project
     remove(projectRef)
       .then(() => {
-        console.log("Project deleted successfully!");
+        toast.success("Project deleted successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       })
       .catch((error) => {
-        console.error("Error deleting project:", error);
+        toast.error("Error deleting project.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       });
   };
 
@@ -552,17 +571,7 @@ export default function ProjectManagement() {
           <img src={url("earth")} style={{ width: "60%" }} alt="" />
         </ParallaxLayer>
 
-        <ParallaxLayer
-          offset={0}
-          speed={0.1}
-          style={
-            {
-              // display: "flex",
-              // alignItems: "center",
-              // justifyContent: "center",
-            }
-          }
-        >
+        <ParallaxLayer offset={0} speed={0.1}>
           <div
             style={{
               position: "absolute",
@@ -585,26 +594,32 @@ export default function ProjectManagement() {
               <Card openModal1={openModal1} />
             </div>
             <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={
+                styles.projects
+                //   {
+                //   display: "grid",
+                //   gridColumn:'repeat',
+                //   // flexWrap: "wrap",
+                //   justifyContent: "space-around",
+                //   margin: "0 -10px",
+                // }
+              }
             >
               {data ? (
-                Object.entries(data).map(([id, project]) => (
-                  <ProjectCard
-                    key={id}
-                    id={id}
-                    {...project}
-                    // onCardClick={() => openModal(project)}
-                    onTimerClick={() => setTimer(!timer)}
-                    timer={timer}
-                    deleteProject={deleteProject}
-                    onEditClick={() => handleEditClick(id, project)}
-                  />
-                ))
+                Object.entries(data)
+                  .reverse()
+                  .map(([id, project]) => (
+                    <ProjectCard
+                      key={id}
+                      id={id}
+                      {...project}
+                      // onCardClick={() => openModal(project)}
+                      onTimerClick={() => setTimer(!timer)}
+                      timer={timer}
+                      deleteProject={deleteProject}
+                      onEditClick={() => handleEditClick(id, project)}
+                    />
+                  ))
               ) : (
                 <div
                   style={{
@@ -635,16 +650,18 @@ export default function ProjectManagement() {
         <ParallaxLayer offset={1} speed={0.1}>
           <div
             style={{
+              position: "absolute",
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
               background: "#F3F8FF",
-              left: "50%",
+              left: "3%",
+              top: "10%",
               width: "80%",
               height: "400px",
               marginBottom: "20px",
-              marginLeft: "30px",
+              // marginLeft: "30px",
               border: "1px solid #F3F8FF",
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               borderRadius: "8px",
@@ -735,6 +752,7 @@ export default function ProjectManagement() {
           projectId={selectedProject ? selectedProject.id : null}
         />
       </Parallax>
+      <ToastContainer />
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // import Dashboard from "../Dashboard/Dashboard";
 import * as Components from "./Components";
 import {
@@ -48,6 +50,14 @@ const Login = () => {
         const user = userCredential.user;
         console.log("User signed in:", user);
         //will navigate to home page later
+        toast.success("Login successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         setTimeout(() => {
           setLoading(false);
           navigate("/dashboard");
@@ -55,7 +65,14 @@ const Login = () => {
         // setSignIn(!signIn);
       })
       .catch((error) => {
-        console.error("Error signing in:", error);
+        toast.error("Failed to sign in.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         setLoading(false);
       });
   };
@@ -116,7 +133,19 @@ const Login = () => {
                 value={password}
                 onChange={handleInputChange}
               />
-              <Components.Anchor href="#">
+              <Components.Anchor
+                href="#"
+                onClick={() => {
+                  toast.success("Coming Soon!", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                  });
+                }}
+              >
                 Forgot your password?
               </Components.Anchor>
               <Components.Button onClick={handleSignIn}>
@@ -150,6 +179,7 @@ const Login = () => {
           </Components.OverlayContainer>
         </Components.Container>
       )}
+      <ToastContainer />
     </>
   );
 };

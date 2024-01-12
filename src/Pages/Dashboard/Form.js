@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { getDatabase, ref, push } from "firebase/database";
 import { app } from "../../firebase.init";
 import "./Form.css";
@@ -40,11 +42,25 @@ const Form = ({ onClose, project }) => {
 
     push(projectsRef, projectData)
       .then(() => {
-        console.log("Project added successfully!");
+        toast.success("Project created successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         onClose();
       })
       .catch((error) => {
-        console.error("Error adding project:", error);
+        toast.error("Failed to create project", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       });
 
     setFormData({
@@ -105,6 +121,7 @@ const Form = ({ onClose, project }) => {
         />
       </label>
       <button onClick={handleCreateButtonClick}>Create</button>
+      <ToastContainer />
     </div>
   );
 };
